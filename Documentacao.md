@@ -24,21 +24,32 @@ Benefícios da Solução
 
 ## 5. Hardware Utilizado / Simulador
 
-Pode-se (e é estimulado) utilizar sensores e atuadores amplamente disponíveis para simular dispositivos específicos da solução.
+Microcontrolador: ESP32 (escolhido pelo Wi-Fi nativo e suporte robusto ao protocolo MQTT).
+
+Sensor: Sensor de Umidade de Solo (Higrômetro).
+
+Atuador: Servo Motor (simulando uma válvula de abertura de água).
+
+Plataforma Cloud: Blynk IoT (atuando como Broker MQTT e servidor de aplicação).
 
 ---
 
 ## 6. Medidas Sensoreadas
 
+Umidade do Solo: Mensurada em valores percentuais (0% a 100%), onde 0% representa solo totalmente seco e 100% solo saturado (água).
 ---
 
 ## 7. Sensores Utilizados
-Medida	Periodicidade da Coleta	Como ocorre a coleta	Sensor real a ser utilizado	Descrição da simulação
+| Medida | Periodicidade da Coleta | Como ocorre a coleta | Sensor real a ser utilizado | Descrição da simulação |
+| :--- | :--- | :--- | :--- | :--- |
+| **Umidade do Solo** | A cada 5 segundos | Leitura analógica via pino ADC da ESP32 | Higrômetro Capacitivo | O valor de tensão lido é mapeado de 0-4095 para uma escala percentual de 0% a 100% no dashboard. |
 
 ---
 
 ## 8. Funcionamento da Simulação (Sensores)
-Sensor utilizado	Funcionamento da simulação
+Sensor de Umidade: O sensor detecta a condutividade/capacitância do solo. 
+
+A simulação da umidade é visualizada através de widgets de Gráfico (Chart) e Medidor (Gauge). Para fins de teste e validação da lógica de irrigação, o sistema monitora se o valor enviado pelo sensor está abaixo do limite (setpoint) configurado no slider, disparando alertas visuais no dashboard sempre que o solo é classificado como 'seco'.
 
 ---
 
@@ -47,30 +58,54 @@ Sensor utilizado	Funcionamento da simulação
 ---
 
 ## 10. Atuadores Utilizados
-Atuação	Quando ocorre	Como ocorre a atuação	Atuador real a ser utilizado	Descrição da atuação
+| Atuação | Quando ocorre | Como ocorre a atuação | Atuador real a ser utilizado | Descrição da atuação |
+| :--- | :--- | :--- | :--- | :--- |
+| **Irrigação** | Umidade < Limite | Ativação via sinal PWM | Servo Motor SG90 | O servo rotaciona o eixo em 90° para simular a abertura de uma válvula de água. |
 
 ---
 
 ## 11. Funcionamento da Simulação (Atuadores)
-Atuador utilizado	Funcionamento da simulação
+Para contornar as limitações de automação em nuvem da versão gratuita, utilizamos o widget Time Input no pino virtual V4. Este componente permite que o usuário envie um cronograma completo de irrigação para o microcontrolador via MQTT. O ESP32 recebe esses parâmetros e os armazena em sua memória local.
+
+O atuador (Servo Motor) responde a dois gatilhos distintos:
+
+Comando Manual: Via botão (Switch) no dashboard ou aplicativo.
+
+Comando Programado: Via lógica de tempo processada pelo microcontrolador a partir dos dados recebidos pelo widget Time Input (V4). O funcionamento é validado pela mudança de estado do pino virtual V2 na interface."
 
 ---
 
 ## 12. Casos de Uso (UML)
 
-Elaborar pelo menos 2 casos de uso da solução.
+**Caso 1: Monitoramento Remoto**
+
+Ator: Usuário (Agricultor).
+
+Descrição: O usuário abre o App Blynk e visualiza o gráfico de umidade em tempo real via protocolo MQTT.
+
+**Caso 2: Ajuste de Setpoint (Configuração)**
+
+Ator: Usuário.
+
+Descrição: O usuário move o Slider no dashboard para definir que a planta deve ser regada quando a umidade atingir 40% (em vez do padrão 30%).
 
 ---
 ## 13. Caso de Uso Escolhido (Implementado)
-
+Nome: Irrigação Inteligente com Agendamento Flexível.
+Descrição: O sistema integra a leitura de umidade com um cronograma horário. O usuário define a janela de funcionamento (ex: das 18h às 18h30) no App. O sistema só ativa o servo se, dentro desse horário, a umidade estiver abaixo do limite. Isso evita o desperdício de água em horários de sol forte e garante que a planta só receba água se realmente precisar.
 ---
 
 ## 14. Diagrama de Atividade (UML)
-<!-- Inserir imagem ou descrição -->
+Início -> 2. Leitura do Sensor -> 3. Publicar valor via MQTT ao Blynk -> 4. A umidade é menor que o Limite? ->
+
+Se SIM: Blynk envia comando via MQTT -> Servo Gira (Abre) -> Notificação enviada ao App.
+
+Se NÃO: Mantém leitura -> Fim do ciclo.
 ---
 
 ## 15. Diagrama de Sequência (UML)
-<!-- Inserir imagem ou descrição -->
+O fluxo segue esta ordem:
+Sensor -> ESP32 -> (MQTT Publish) -> Blynk Broker -> (Update Dashboard) -> Automação Blynk -> (MQTT Publish) -> ESP32 -> Servo Motor.
 ---
 
 ## 16. Implementação
@@ -81,8 +116,8 @@ Inserir screenshots dos dashboards desenvolvidos, com comentários explicando ca
 
 ## 17. Implementações Extras
 
-Descrever aqui implementações adicionais realizadas na solução:
+Sincronização de Tempo via NTP: "Implementamos a lógica de consulta a servidores de tempo (Network Time Protocol) para que o microcontrolador mantenha o relógio atualizado via internet, permitindo que o agendamento do usuário seja preciso."
 
-<!-- Exemplo: Integração com app mobile -->
-<!-- Exemplo: Alertas em tempo real -->
-<!-- Exemplo: Machine Learning -->
+Interface Multiplataforma: "A solução foi desenvolvida para operação híbrida, onde o monitoramento pesado é feito via Dashboard Web e o controle operacional/agendamento é realizado via App Mobile, otimizando a experiência do usuário."
+
+Resiliência de Operação: "Ao processar a lógica de tempo localmente no hardware (recebendo os dados do V4), garantimos que o sistema seja menos dependente de latências da nuvem para a execução de tarefas críticas."
