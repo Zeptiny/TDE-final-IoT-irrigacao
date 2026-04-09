@@ -11,6 +11,7 @@
 | DATA | AUTOR | DESCRIÇÃO     |
 |--------|-------|------------|
 | 03/04/2026  | Artur e Gustavo    | Definição do tema, estudos sobre as tecnologias de software e hardware  |
+| 06/04/2026 a 09/04/2026 |Gustavo| Elaboração do dispositivo no blynk, app mobile, automação e adição de tópicos no relatório |
 
 ---
 		
