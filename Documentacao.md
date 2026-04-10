@@ -84,11 +84,21 @@ Ator: Usuário (Agricultor).
 
 Descrição: O usuário abre o App Blynk e visualiza o gráfico de umidade em tempo real via protocolo MQTT.
 
+Fluxo Normal:
+- O usuário acessa o dashboard.
+- O usuário visualiza o gráfico de umidade em tempo real.
+
+
 **Caso 2: Ajuste de Setpoint (Configuração)**
 
 Ator: Usuário.
 
 Descrição: O usuário move o Slider no dashboard para definir que a planta deve ser regada quando a umidade atingir 40% (em vez do padrão 30%).
+
+Fluxo Normal:
+- O usuário acessa o dashboard.
+- O usuário ajusta o Slider para 40%.
+- O novo valor é publicado via MQTT para o microcontrolador.
 
 ---
 ## 13. Caso de Uso Escolhido (Implementado)
@@ -97,11 +107,7 @@ Descrição: O sistema integra a leitura de umidade com um cronograma horário. 
 ---
 
 ## 14. Diagrama de Atividade (UML)
-Início -> 2. Leitura do Sensor -> 3. Publicar valor via MQTT ao Blynk -> 4. A umidade é menor que o Limite? ->
-
-Se SIM: Blynk envia comando via MQTT -> Servo Gira (Abre) -> Notificação enviada ao App.
-
-Se NÃO: Mantém leitura -> Fim do ciclo.
+![Diagrama de Atividade](./UML/IoT_UML_Atividade.drawio.png)
 ---
 
 ## 15. Diagrama de Sequência (UML)
