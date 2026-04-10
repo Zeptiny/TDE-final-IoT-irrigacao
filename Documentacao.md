@@ -12,6 +12,7 @@
 |--------|-------|------------|
 | 03/04/2026  | Artur e Gustavo    | Definição do tema, estudos sobre as tecnologias de software e hardware  |
 | 06/04/2026 a 09/04/2026 |Gustavo| Elaboração do dispositivo no blynk, app mobile, automação e adição de tópicos no relatório |
+| 10/04/2026  | Artur e Gustavo    | Elaboração do código inicial da ESP com Blynk (Controle de umidade, abertura/fechamento de bomba manual e automático), alteração nos casos de uso e diagrama de atividade  |
 
 ---
 		
