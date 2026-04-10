@@ -122,9 +122,4 @@ Inserir screenshots dos dashboards desenvolvidos, com comentários explicando ca
 ---
 
 ## 17. Implementações Extras
-
-Sincronização de Tempo via NTP: "Implementamos a lógica de consulta a servidores de tempo (Network Time Protocol) para que o microcontrolador mantenha o relógio atualizado via internet, permitindo que o agendamento do usuário seja preciso."
-
-Interface Multiplataforma: "A solução foi desenvolvida para operação híbrida, onde o monitoramento pesado é feito via Dashboard Web e o controle operacional/agendamento é realizado via App Mobile, otimizando a experiência do usuário."
-
-Resiliência de Operação: "Ao processar a lógica de tempo localmente no hardware (recebendo os dados do V4), garantimos que o sistema seja menos dependente de latências da nuvem para a execução de tarefas críticas."
+- MQTT
