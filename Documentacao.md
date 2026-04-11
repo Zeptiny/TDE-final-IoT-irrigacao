@@ -13,6 +13,7 @@
 | 03/04/2026  | Artur e Gustavo    | Definição do tema, estudos sobre as tecnologias de software e hardware  |
 | 06/04/2026 a 09/04/2026 |Gustavo| Elaboração do dispositivo no blynk, app mobile, automação e adição de tópicos no relatório |
 | 10/04/2026  | Artur e Gustavo    | Elaboração do código inicial da ESP com Blynk (Controle de umidade, abertura/fechamento de bomba manual e automático), alteração nos casos de uso e diagrama de atividade  |
+| 11/04/2026  | Artur e Gustavo    | Adição de informações, imagens e funcionamento do projeto ao relatório  |
 
 ---
 		
@@ -53,6 +54,8 @@ Sensor de Umidade: O sensor detecta a condutividade/capacitância do solo.
 
 A simulação da umidade é visualizada através de widgets de Gráfico (Chart) e Medidor (Gauge). Para fins de teste e validação da lógica de irrigação, o sistema monitora se o valor enviado pelo sensor está abaixo do limite (setpoint) configurado no slider, disparando alertas visuais no dashboard sempre que o solo é classificado como 'seco'.
 
+O valor analógico bruto do sensor (**0** a **4095**) é processado via função map(), convertendo a tensão em uma escala percentual linear de umidade, facilitando a interpretação do usuário final
+
 ---
 
 ## 9. Atuações Realizadas
@@ -69,11 +72,13 @@ A simulação da umidade é visualizada através de widgets de Gráfico (Chart) 
 ## 11. Funcionamento da Simulação (Atuadores)
 Para contornar as limitações de automação em nuvem da versão gratuita, utilizamos o widget Time Input no pino virtual V4. Este componente permite que o usuário envie um cronograma completo de irrigação para o microcontrolador via MQTT. O ESP32 recebe esses parâmetros e os armazena em sua memória local.
 
-O atuador (Servo Motor) responde a dois gatilhos distintos:
+O atuador (Servo Motor) responde a três estados lógicos distintos e intertravados:
 
-Comando Manual: Via botão (Switch) no dashboard ou aplicativo.
+Comando Manual Forçado (V2): Acionamento direto via Switch no dashboard, que ignora a leitura do sensor para manutenções rápidas.
 
-Comando Programado: Via lógica de tempo processada pelo microcontrolador a partir dos dados recebidos pelo widget Time Input (V4). O funcionamento é validado pela mudança de estado do pino virtual V2 na interface."
+Automação por Setpoint (V3): O usuário define a meta de umidade via Slider. O sistema calcula o erro entre a umidade atual e a desejada para decidir o acionamento.
+
+Lógica de Intertravamento: Sistema de segurança via software que impede que comandos manuais e automáticos entrem em conflito, garantindo a estabilidade do atuador.
 
 ---
 
@@ -103,17 +108,22 @@ Fluxo Normal:
 
 ---
 ## 13. Caso de Uso Escolhido (Implementado)
-Nome: Irrigação Inteligente com Agendamento Flexível.
-Descrição: O sistema integra a leitura de umidade com um cronograma horário. O usuário define a janela de funcionamento (ex: das 18h às 18h30) no App. O sistema só ativa o servo se, dentro desse horário, a umidade estiver abaixo do limite. Isso evita o desperdício de água em horários de sol forte e garante que a planta só receba água se realmente precisar.
+
+Nome: Irrigação Inteligente com Intertravamento de Segurança.
+
+Descrição: O sistema integra a leitura em tempo real com uma meta definida pelo usuário. A inovação está na proteção lógica: o usuário tem controle total (manual), mas ao ativar a automação, o sistema protege a planta garantindo que a irrigação só ocorra se a umidade real estiver abaixo do limite configurado, impedindo o acionamento acidental pelo botão manual enquanto a automação está ativa.
+
 ---
 
 ## 14. Diagrama de Atividade (UML)
+
 ![Diagrama de Atividade](./UML/IoT_UML_Atividade.drawio.png)
 ---
 
 ## 15. Diagrama de Sequência (UML)
-O fluxo segue esta ordem:
-Sensor -> ESP32 -> (MQTT Publish) -> Blynk Broker -> (Update Dashboard) -> Automação Blynk -> (MQTT Publish) -> ESP32 -> Servo Motor.
+
+Fluxo: Sensor Higrômetro $\rightarrow$ ESP32 (ADC) $\rightarrow$ Lógica de Comparação (Setpoint) $\rightarrow$ Publicação MQTT (Tópico ds/umidade) $\rightarrow$ Dashboard Blynk (Atualização do Gauge V1) $\rightarrow$ Acionamento Servo (PWM).
+
 ---
 
 ## 16. Implementação
@@ -123,4 +133,11 @@ Inserir screenshots dos dashboards desenvolvidos, com comentários explicando ca
 ---
 
 ## 17. Implementações Extras
-- MQTT
+
+- Protocolo MQTT Nativo: Implementação da biblioteca PubSubClient para envio de telemetria independente da interface Blynk.
+
+- Intertravamento de Software (Software Interlocking): Lógica que impede o acionamento do Slider se o Botão Manual estiver ativo e vice-versa.
+
+- Feedback Personalizado via Serial: Sistema de mensagens dinâmicas no console que confirma ao usuário a configuração exata da meta de umidade escolhida.
+
+- Filtro de Ruído Digital: Implementação de um timer para ajudar a estabilizar a leitura do sensor analógico de umidade.
