@@ -6,10 +6,15 @@
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
 #include <ESP32Servo.h>
+#include <PubSubClient.h>
+
+// MQTT
+WiFiClient wifiClient;
+PubSubClient mqttClient(wifiClient);
 
 // Credenciais da rede
-char ssid[] = "Airton Sala"; 
-char pass[] = "20303009rosset"; 
+char ssid[] = "A25 de Gregori"; 
+char pass[] = "09111218Pichu"; 
 
 // Objetos
 Servo meuServo;
@@ -70,12 +75,25 @@ BLYNK_WRITE(V2) {
 // PROCESSAMENTO: Leitura e Decisão Automática
 void processarDadosSistema() {
   // 1. Leitura do Sensor
-  int valorBruto = analogRead(pinoSensor);
+  // DEBUG: Valor aleatório
+  int valorBruto = random(0, 4095);
+  //int valorBruto = analogRead(pinoSensor);
   // Converte a leitura analógica para porcentagem (0 a 100%)
   umidadePercentual = map(valorBruto, 4095, 0, 0, 100); 
+  Serial.println("Umidade Atual: " + String(umidadePercentual) + "%");
   
   // Atualiza o Gauge (V1) no celular
-  Blynk.virtualWrite(V1, umidadePercentual);
+  //Blynk.virtualWrite(V1, umidadePercentual);
+  if (mqttClient.connected()) {
+    if (mqttClient.publish("ds/umidade", String(umidadePercentual).c_str())) {
+      Serial.println("MQTT: Umidade enviada com sucesso.");
+    } else {
+      Serial.println("MQTT: Falha ao enviar umidade.");
+    }
+  } else {
+    Serial.println("MQTT: Cliente não conectado. Não foi possível enviar a umidade.");
+  }
+
 
   // 2. Lógica de Controle do sistema
   // Se o botão manual estiver ligado, a automação abaixo não roda
@@ -102,13 +120,45 @@ void processarDadosSistema() {
   }
 }
 
+//
+// MQTT
+//
+
+// OBS: Por enquanto não está inscrito em nenhum tópico
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("MQTT Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (unsigned int i = 0; i < length; i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+}
+
+
+void mqttSetup(){
+  mqttClient.setServer("blynk.cloud", 1883);
+  // OBS: cleanSession não está ativada, e keepalive não configurado, talvez dê problema
+  if (mqttClient.connect("", "device", BLYNK_AUTH_TOKEN)) {
+    Serial.println("MQTT Conectado com Sucesso!");
+
+    mqttClient.setCallback(mqttCallback);
+  }
+
+}
+
+//
+// END MQTT
+//
+
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   
   meuServo.attach(pinoServo);
   meuServo.write(0); // Inicia fechado, bomba desligada
   
   Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
+  mqttSetup();
   
   // Roda a função de processamento a cada 10 segundos
   timer.setInterval(10000L, processarDadosSistema);
@@ -122,4 +172,5 @@ void setup() {
 void loop() {
   Blynk.run();
   timer.run();
+  mqttClient.loop();
 }
