@@ -13,8 +13,8 @@ WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 
 // Credenciais da rede
-char ssid[] = "A25 de Gregori"; 
-char pass[] = "09111218Pichu"; 
+char ssid[] = "Vida Nova"; 
+char pass[] = "fevereiro24"; 
 
 // Objetos
 Servo meuServo;
@@ -76,8 +76,8 @@ BLYNK_WRITE(V2) {
 void processarDadosSistema() {
   // 1. Leitura do Sensor
   // DEBUG: Valor aleatório
-  int valorBruto = random(0, 4095);
-  //int valorBruto = analogRead(pinoSensor);
+  // int valorBruto = random(0, 4095);
+  int valorBruto = analogRead(pinoSensor);
   // Converte a leitura analógica para porcentagem (0 a 100%)
   umidadePercentual = map(valorBruto, 4095, 0, 0, 100); 
   Serial.println("Umidade Atual: " + String(umidadePercentual) + "%");
@@ -136,15 +136,22 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 }
 
 
+void mqttReconnect() {
+  if (mqttClient.connected()) return;
+
+  Serial.print("MQTT: Tentando reconectar...");
+  if (mqttClient.connect("", "device", BLYNK_AUTH_TOKEN)) {
+    Serial.println(" Conectado!");
+  } else {
+    Serial.print(" Falhou, rc=");
+    Serial.println(mqttClient.state());
+  }
+}
+
 void mqttSetup(){
   mqttClient.setServer("blynk.cloud", 1883);
-  // OBS: cleanSession não está ativada, e keepalive não configurado, talvez dê problema
-  if (mqttClient.connect("", "device", BLYNK_AUTH_TOKEN)) {
-    Serial.println("MQTT Conectado com Sucesso!");
-
-    mqttClient.setCallback(mqttCallback);
-  }
-
+  mqttClient.setCallback(mqttCallback);
+  mqttReconnect();
 }
 
 //
@@ -161,7 +168,7 @@ void setup() {
   mqttSetup();
   
   // Roda a função de processamento a cada 10 segundos
-  timer.setInterval(10000L, processarDadosSistema);
+  timer.setInterval(1000L, processarDadosSistema);
   
   Serial.println("------------------------------------------");
   Serial.println("PROJETO SMART IRRIGATION - PRONTO");
@@ -172,5 +179,6 @@ void setup() {
 void loop() {
   Blynk.run();
   timer.run();
+  mqttReconnect();
   mqttClient.loop();
 }
