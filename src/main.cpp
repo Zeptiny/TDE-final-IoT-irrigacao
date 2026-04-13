@@ -168,7 +168,7 @@ void setup() {
   mqttSetup();
   
   // Roda a função de processamento a cada 10 segundos
-  timer.setInterval(1000L, processarDadosSistema);
+  timer.setInterval(10000L, processarDadosSistema);
   
   Serial.println("------------------------------------------");
   Serial.println("PROJETO SMART IRRIGATION - PRONTO");
