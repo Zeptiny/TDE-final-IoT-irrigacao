@@ -147,7 +147,25 @@ Fluxo: Sensor Higrômetro $\rightarrow$ ESP32 (ADC) $\rightarrow$ Lógica de Com
 
 ## 16. Implementação
 
-Inserir screenshots dos dashboards desenvolvidos, com comentários explicando cada parte.
+### Dashboard Web
+
+![Dashboard](./img/dash.png)
+
+O dashboard web contém as seguintes funções:
+- Ativação manual da bomba: Força ela estar ligada, apenas funciona quando o ajuste manual está em 0%
+- Ajuste manual: Define a porcentagem desejada da umidade, fazendo a bomba ligar quando estiver abaixo do limite definido, apenas funciona quando o ajuste manual está desligado.
+
+- Medidor de umidade: Mostra a porcentagem atual da umidade do solo, atualizada em tempo real via MQTT.
+- Gráfico de histórico de umidade: Exibe a evolução da umidade ao longo do tempo
+
+### Montagem
+
+![Montagem](./img/montagem.png)
+
+A montagem do projeto se constitiu nos seguintes componentes:
+- ESP32: Microcontrolador central que processa as leituras do sensor e controla o atuador.
+- Sensor de Umidade: Para leitura analógica da umidade do solo.
+- Servo Motor: Simular a abertura/fechamento da válvula de água.
 
 ---
 
