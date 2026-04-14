@@ -29,6 +29,19 @@ bool modoManualForcado = false; // Status do botão V2
 int umidadePercentual = 0;      // Leitura atual do sensor
 int limiteUmidade = 0;          // Meta de umidade escolhida no Slider (V3)
 
+//Funçaõ par analisar se o problema é o servo ou a peca atras dele
+void moverServo(int angulo) {
+  Serial.print("Movendo servo para: ");
+  Serial.println(angulo);
+  
+  meuServo.attach(pinoServo, 500, 2400); // Liga o sinal
+  delay(50); 
+  meuServo.write(angulo);                // Comando de movimento
+  delay(800);                            // Tempo para o braço físico chegar no lugar
+  meuServo.detach();                     // DESLIGA o sinal (Motor relaxa e para de esquentar, eu espero)
+  Serial.println("Movimento concluído. Motor em repouso.");
+}
+
 //LÓGICA DO SLIDER (V3): Define a porcentagem de umidade desejada 
 BLYNK_WRITE(V3) {
   int valorSlider = param.asInt();
@@ -63,10 +76,10 @@ BLYNK_WRITE(V2) {
     modoManualForcado = (estadoBotao == 1);
     
     if (modoManualForcado) {
-      meuServo.write(80); // Abre totalmente a bomba no manual
+      moverServo(80); // Abre totalmente a bomba no manual
       Serial.println("MODO MANUAL ATIVADO: Bomba ligada via App.");
     } else {
-      meuServo.write(10);  // Fecha a bomba
+      moverServo(10);  // Fecha a bomba
       Serial.println("MODO MANUAL DESATIVADO: Bomba desligada.");
     }
   }
@@ -114,7 +127,7 @@ void processarDadosSistema() {
       Serial.println("%). Irrigando...");
     } else {
       // Se atingiu a meta, fecha
-      meuServo.write(0);
+      moverServo(0);
       Serial.println("AUTOMÁTICO: Meta atingida. Bomba desligada.");
     }
   }
@@ -165,7 +178,7 @@ void setup() {
   ESP32PWM::allocateTimer(1);
   meuServo.setPeriodHertz(50);
   meuServo.attach(pinoServo, 500, 2400);
-  meuServo.write(10); // Inicia fechado, bomba desligada, testando com 10 para ver se para de esuentar e travar
+  moverServo(10); // Inicia fechado, bomba desligada, testando com 10 para ver se para de esuentar e travar
   
   Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
   mqttSetup();
