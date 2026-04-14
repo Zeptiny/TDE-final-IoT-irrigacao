@@ -164,7 +164,8 @@ void setup() {
   ESP32PWM::allocateTimer(0);
   ESP32PWM::allocateTimer(1);
   meuServo.setPeriodHertz(50);
-  meuServo.attach(pinoServo, 500, 2400);
+  meuServo.attach(pinoServo, 0, 0, 180, 500, 2400);
+  // meuServo.attach(pinoServo, 500, 2400);
   meuServo.write(10); // Inicia fechado, bomba desligada, testando com 10 para ver se para de esuentar e travar
   
   Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
