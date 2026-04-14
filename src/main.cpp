@@ -55,6 +55,12 @@ void moverServo(int anguloAlvo) {
   Serial.println("Movimento suave concluído.");
 }
 
+// Pega o estado do Blynk quando conecta
+BLYNK_CONNECTED() {
+  Blynk.syncVirtual(V2); // Sincroniza o estado do botão manual
+  Blynk.syncVirtual(V3); // Sincroniza o valor do slider
+}
+
 //LÓGICA DO SLIDER (V3): Define a porcentagem de umidade desejada 
 BLYNK_WRITE(V3) {
   int valorSlider = param.asInt();
