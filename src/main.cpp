@@ -23,6 +23,7 @@ BlynkTimer timer;
 // Pinos
 const int pinoSensor = 34; 
 const int pinoServo  = 18; 
+int estadoAnteriorServo = -1;
 
 // Variáveis de Controle
 bool modoManualForcado = false; // Status do botão V2
@@ -99,48 +100,33 @@ BLYNK_WRITE(V2) {
 
 // PROCESSAMENTO: Leitura e Decisão Automática
 void processarDadosSistema() {
-  // 1. Leitura do Sensor
-  // DEBUG: Valor aleatório
-  // int valorBruto = random(0, 4095);
   int valorBruto = analogRead(pinoSensor);
-  // Converte a leitura analógica para porcentagem (0 a 100%)
   umidadePercentual = map(valorBruto, 4095, 0, 0, 100); 
   Serial.println("Umidade Atual: " + String(umidadePercentual) + "%");
   
-  // Atualiza o Gauge (V1) no celular
-  //Blynk.virtualWrite(V1, umidadePercentual);
   if (mqttClient.connected()) {
-    if (mqttClient.publish("ds/umidade", String(umidadePercentual).c_str())) {
-      Serial.println("MQTT: Umidade enviada com sucesso.");
-    } else {
-      Serial.println("MQTT: Falha ao enviar umidade.");
-    }
-  } else {
-    Serial.println("MQTT: Cliente não conectado. Não foi possível enviar a umidade.");
+    mqttClient.publish("ds/umidade", String(umidadePercentual).c_str());
   }
 
+  // Se o manual estiver ligado, a automação para aqui
+  if (modoManualForcado == true) return; 
 
-  // 2. Lógica de Controle do sistema
-  // Se o botão manual estiver ligado, a automação abaixo não roda
-  if (modoManualForcado == true) {
-    return; 
-  }
-
-  // Modo Automático: Só funciona se o Slider estiver acima de 0%
+  // Modo Automático: Só age se o Slider for maior que 0
   if (limiteUmidade > 0) {
-    // Se a umidade atual for menor que a escolhida no Slider
     if (umidadePercentual < limiteUmidade) {
-      // Abre o servo para irrigar
-      meuServo.write(90); 
-      Serial.print("AUTOMÁTICO: Umidade (");
-      Serial.print(umidadePercentual);
-      Serial.print("%) abaixo da meta (");
-      Serial.print(limiteUmidade);
-      Serial.println("%). Irrigando...");
+      // SÓ MOVE SE ESTIVER FECHADO
+      if (estadoAnteriorServo != 1) { 
+        Serial.println("AUTOMÁTICO: Solo seco. Abrindo...");
+        moverServo(80); 
+        estadoAnteriorServo = 1; // Marca como Aberto
+      }
     } else {
-      // Se atingiu a meta, fecha
-      moverServo(0);
-      Serial.println("AUTOMÁTICO: Meta atingida. Bomba desligada.");
+      // SÓ MOVE SE ESTIVER ABERTO
+      if (estadoAnteriorServo != 0) {
+        Serial.println("AUTOMÁTICO: Meta atingida. Fechando...");
+        moverServo(10); 
+        estadoAnteriorServo = 0; // Marca como Fechado
+      }
     }
   }
 }
