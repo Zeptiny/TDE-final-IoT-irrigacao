@@ -70,7 +70,6 @@ O valor analógico bruto do sensor (**0** a **4095**) é processado via função
 ---
 
 ## 11. Funcionamento da Simulação (Atuadores)
-Para contornar as limitações de automação em nuvem da versão gratuita, utilizamos o widget Time Input no pino virtual V4. Este componente permite que o usuário envie um cronograma completo de irrigação para o microcontrolador via MQTT. O ESP32 recebe esses parâmetros e os armazena em sua memória local.
 
 O atuador (Servo Motor) responde a três estados lógicos distintos e intertravados:
 
@@ -141,3 +140,5 @@ Inserir screenshots dos dashboards desenvolvidos, com comentários explicando ca
 - Feedback Personalizado via Serial: Sistema de mensagens dinâmicas no console que confirma ao usuário a configuração exata da meta de umidade escolhida.
 
 - Filtro de Ruído Digital: Implementação de um timer para ajudar a estabilizar a leitura do sensor analógico de umidade.
+
+- Algoritmo de Auto-Recuperação (Watchdog de Conexão): Implementação de rotina de reconexão automática ao Broker MQTT, garantindo que o sistema retome o envio de dados sem necessidade de reset físico após quedas de rede.
