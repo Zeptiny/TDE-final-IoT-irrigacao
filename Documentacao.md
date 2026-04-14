@@ -14,6 +14,8 @@
 | 06/04/2026 a 09/04/2026 |Gustavo| Elaboração do dispositivo no blynk, app mobile, automação e adição de tópicos no relatório |
 | 10/04/2026  | Artur e Gustavo    | Elaboração do código inicial da ESP com Blynk (Controle de umidade, abertura/fechamento de bomba manual e automático), alteração nos casos de uso e diagrama de atividade  |
 | 11/04/2026  | Artur e Gustavo    | Adição de informações, imagens e funcionamento do projeto ao relatório  |
+| 13/04/2026  | Gustavo    | Inicio da elaboração da apresentação  |
+| 14/04/2026  | Artur e Gustavo    | Término da apresentação, ajustes e testes no codigo, final da construção do projeto  |
 
 ---
 		
