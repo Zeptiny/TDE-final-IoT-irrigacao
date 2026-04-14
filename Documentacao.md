@@ -141,7 +141,7 @@ Descrição: O sistema integra a leitura em tempo real com uma meta definida pel
 
 ## 15. Diagrama de Sequência (UML)
 
-Fluxo: Sensor Higrômetro $\rightarrow$ ESP32 (ADC) $\rightarrow$ Lógica de Comparação (Setpoint) $\rightarrow$ Publicação MQTT (Tópico ds/umidade) $\rightarrow$ Dashboard Blynk (Atualização do Gauge V1) $\rightarrow$ Acionamento Servo (PWM).
+![Diagrama de Sequência](./UML/Sequence_Diagram.png)
 
 ---
 
