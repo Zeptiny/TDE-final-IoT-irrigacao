@@ -180,3 +180,5 @@ A montagem do projeto se constitiu nos seguintes componentes:
 - Filtro de Ruído Digital: Implementação de um timer para ajudar a estabilizar a leitura do sensor analógico de umidade.
 
 - Algoritmo de Auto-Recuperação (Watchdog de Conexão): Implementação de rotina de reconexão automática ao Broker MQTT, garantindo que o sistema retome o envio de dados sem necessidade de reset físico após quedas de rede.
+
+- Camada de Notificação Inteligente (Blynk Cloud Automation): Implementação de uma regra de automação processada diretamente nos servidores do Blynk (Cloud). O sistema monitora o Datastream V1 (Umidade) e, caso o valor caia abaixo de 20%, o servidor dispara uma Notificação Push prioritária para o smartphone do usuário. A mensagem é configurada com tags dinâmicas ({TRIGGER_VALUE}), informando em tempo real a umidade crítica detectada, servindo como uma camada de redundância e segurança para o monitoramento remoto.
