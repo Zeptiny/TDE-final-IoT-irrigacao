@@ -30,16 +30,28 @@ int umidadePercentual = 0;      // Leitura atual do sensor
 int limiteUmidade = 0;          // Meta de umidade escolhida no Slider (V3)
 
 //Funçaõ par analisar se o problema é o servo ou a peca atras dele
-void moverServo(int angulo) {
-  Serial.print("Movendo servo para: ");
-  Serial.println(angulo);
-  
-  meuServo.attach(pinoServo, 500, 2400); // Liga o sinal
-  delay(50); 
-  meuServo.write(angulo);                // Comando de movimento
-  delay(800);                            // Tempo para o braço físico chegar no lugar
-  meuServo.detach();                     // DESLIGA o sinal (Motor relaxa e para de esquentar, eu espero)
-  Serial.println("Movimento concluído. Motor em repouso.");
+void moverServo(int anguloAlvo) {
+  static int anguloAtual = 10; // Começa no 10
+  meuServo.attach(pinoServo, 500, 2400);
+  delay(50);
+
+  // Move de 1 em 1 grau para não dar pico de corrente
+  if (anguloAlvo > anguloAtual) {
+    for (int pos = anguloAtual; pos <= anguloAlvo; pos++) {
+      meuServo.write(pos);
+      delay(15); // Velocidade do movimento
+    }
+  } else {
+    for (int pos = anguloAtual; pos >= anguloAlvo; pos--) {
+      meuServo.write(pos);
+      delay(15);
+    }
+  }
+
+  anguloAtual = anguloAlvo; // Atualiza a posição atual
+  delay(200);
+  meuServo.detach(); 
+  Serial.println("Movimento suave concluído.");
 }
 
 //LÓGICA DO SLIDER (V3): Define a porcentagem de umidade desejada 
