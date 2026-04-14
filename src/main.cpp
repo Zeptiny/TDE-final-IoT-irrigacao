@@ -63,10 +63,10 @@ BLYNK_WRITE(V2) {
     modoManualForcado = (estadoBotao == 1);
     
     if (modoManualForcado) {
-      meuServo.write(90); // Abre totalmente a bomba no manual
+      meuServo.write(80); // Abre totalmente a bomba no manual
       Serial.println("MODO MANUAL ATIVADO: Bomba ligada via App.");
     } else {
-      meuServo.write(0);  // Fecha a bomba
+      meuServo.write(10);  // Fecha a bomba
       Serial.println("MODO MANUAL DESATIVADO: Bomba desligada.");
     }
   }
