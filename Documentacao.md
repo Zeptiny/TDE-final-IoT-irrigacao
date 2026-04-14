@@ -40,6 +40,7 @@ Plataforma Cloud: Blynk IoT (atuando como Broker MQTT e servidor de aplicação)
 ## 6. Medidas Sensoreadas
 
 Umidade do Solo: Mensurada em valores percentuais (0% a 100%), onde 0% representa solo totalmente seco e 100% solo saturado (água).
+
 ---
 
 ## 7. Sensores Utilizados
@@ -59,6 +60,25 @@ O valor analógico bruto do sensor (**0** a **4095**) é processado via função
 ---
 
 ## 9. Atuações Realizadas
+
+As atuações do sistema consistem no controle físico do fluxo de água (simulado pelo servo motor) e no feedback de status para o usuário. As ações são divididas em duas modalidades:
+
+**9.1. Atuação Automática (Controle por Setpoint)**
+Descrição: O sistema compara a leitura atual do sensor com o limite definido pelo usuário no Slider (V3).
+
+Ação: Se a umidade lida for inferior ao limite estabelecido, o sistema aciona o servo motor para a posição de 80° (Aberto). Ao atingir a meta, o servo retorna para 10° (Fechado).
+
+Diferencial: Implementação de histerese via software, garantindo que o motor só mude de posição quando houver uma alteração real na necessidade hídrica, evitando acionamentos intermitentes.
+
+**9.2. Atuação Manual (Controle Forçado)**
+Descrição: Sobreposição dos comandos automáticos através do botão Switch (V2) no Dashboard.
+
+Ação: Permite a abertura ou fechamento imediato da válvula para manutenção ou testes, independentemente da umidade lida pelo sensor.
+
+**9.3. Gestão de Energia e Sinal (Proteção do Atuador)**
+Descrição: Gerenciamento do sinal PWM enviado ao servo.
+
+Ação: Uso da técnica de Detaching, onde o sinal de controle é interrompido após a conclusão do movimento. Isso elimina a vibração (jitter) e evita o superaquecimento do motor em períodos de repouso.
 
 ---
 
